@@ -2,20 +2,34 @@ from jira import JIRA
 from jira.exceptions import JIRAError
 import smtplib
 from email.mime.text import MIMEText
+import yaml
+# get secret credentials
+with open('credentials.yaml', 'r') as file:
+    credentials = yaml.safe_load(file)
+# get jira query global params
+with open('jira_query_params.yaml', 'r') as file:
+    jira_query_params = yaml.safe_load(file)
 
-# Connect to Jira
-jira = JIRA(
-    server='https://jira.domain/',
-    basic_auth=('user', 'pass')
-)
+domain = credentials['jira']['domain']
+user = credentials['jira']['user']
+password = credentials['jira']['pass']
+try:
+    jira = JIRA(
+        server=domain,
+        basic_auth=(user, password)
+    )
+except JIRAError as e:
+   print(e.status_code, e.text)
 
 # Get the counts of each type of ticket
-query_project_filter  = ' PROJECT in ("VMDS","Visual Merch DZ Development","DMAS") and issuetype != Epic ' 
-days_back  = 8 
-query_order_by  = ' ORDER BY resolved DESC,  priority DESC, due ASC, status ASC, project ASC, key ASC ' 
-completed_tickets = jira.search_issues(query_project_filter + ' AND  resolved >= -' + str(days_back) + 'd ' + query_order_by)
-in_progress_tickets = jira.search_issues(query_project_filter + ' AND (status not in (Completed, Completed, Done, Cancelled, "To Do", Backlog) ) ' + query_order_by)
-new_tickets = jira.search_issues(query_project_filter + ' and resolved = null and created >= -' + str(days_back) + 'd ' + query_order_by)
+projects_names  = jira_query_params['projects'] 
+projects  = '( PROJECT in ( ' + projects_names + ') and issuetype != Epic and status != "Cancelled" ) ' 
+days_back  = jira_query_params['days_back']
+not_in_progress_status  = jira_query_params['not_in_progress_status']
+order_by = jira_query_params['order_by']
+completed_tickets = jira.search_issues(projects + ' AND  resolved >= -' + str(days_back) + 'd ' + order_by)
+in_progress_tickets = jira.search_issues(projects + ' AND (status not in ( ' + not_in_progress_status + ') ) ' + order_by)
+new_tickets = jira.search_issues(projects + ' and resolved = null and created >= -' + str(days_back) + 'd ' + order_by)
 completed_count = len(completed_tickets)
 in_progress_count = len(in_progress_tickets)
 new_count = len(new_tickets)
@@ -62,15 +76,15 @@ print(report)
 
 # Email the report
 
-import win32com.client as win32
-outlook=win32.Dispatch('outlook.application')
-mail=outlook.CreateItem(0)
-mail.To='youremail@yourdomain.com;'
-mail.Subject= 'Projects Status'
-mail.Body=report
-# mail.HTMLBody=body
+# import win32com.client as win32
+# outlook=win32.Dispatch('outlook.application')
+# mail=outlook.CreateItem(0)
+# mail.To='youremail@yourdomain.com;'
+# mail.Subject= 'Projects Status'
+# mail.Body=report
+# # mail.HTMLBody=body
 
-mail.Send()
+# mail.Send()
 
 
 
