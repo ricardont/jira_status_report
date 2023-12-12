@@ -45,12 +45,19 @@ new_count = len(new_tickets)
 
 # Create the report
 report = f'''
-    <h3>Tasks Status within the last {str(days_back)} days</h3>
-        <li>Completed: {completed_count}</li>
-    <ul>
-        <li>In Progress: {in_progress_count}</li>
-        <li>New: {new_count}</li>
-    </ul>
+<h3>Tasks Status within the last {str(days_back)} days</h3>
+<table>
+    <tr align="center">
+        <th>Completed</th>
+        <th>In Progress</th>
+        <th>New</th>
+    </tr>
+    <tr style="font-size:40px" >
+        <td align="center" width="150" >{completed_count}</td>
+        <td align="center" width="150" >{in_progress_count}</td>
+        <td align="center" width="150" >{new_count}</td>
+    </tr>
+</table>
 '''
 
 # Add the Completed tickets to the report
