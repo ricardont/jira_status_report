@@ -22,7 +22,22 @@ except JIRAError as e:
    print(e.status_code, e.text)
 
 # Get the counts of each type of ticket
-projects_names  = jira_query_params['projects'] 
+# projects_names  = "VMDS","VMDD","DMAS"
+projects_names  = '"VMDS","VMDD","DMAS"'
+area = 'Visual Merch'  
+if area == 'Merch Analysis' :
+    projects_names += '"DMAS"' 
+elif area == 'Visual Merch':
+    projects_names = 'VMDS,VMDD'
+else:
+    area = 'Merch'
+
+
+boards = 'DMAS'
+if area == "All":
+    boards += ',VMDS,VMDD' 
+if area == "Visual Merch":
+    boards = 'VMDS,VMDD'        
 projects  = '( PROJECT in ( ' + projects_names + ') and issuetype != Epic and status != "Cancelled" ) ' 
 days_back  = jira_query_params['days_back']
 not_in_progress_status  = jira_query_params['not_in_progress_status']
@@ -75,26 +90,17 @@ print(report)
 
 
 # Email the report
+recipient    = credentials['mail']['recipient']
+sender       = credentials['mail']['sender']
+mail_host    = credentials['mail']['host']
+mail_port    = credentials['mail']['port']
+subject = area + ' Projects Status'
 
-# import win32com.client as win32
-# outlook=win32.Dispatch('outlook.application')
-# mail=outlook.CreateItem(0)
-# mail.To='youremail@yourdomain.com;'
-# mail.Subject= 'Projects Status'
-# mail.Body=report
-# # mail.HTMLBody=body
+import win32com.client as win32
+outlook=win32.Dispatch('outlook.application')
+mail=outlook.CreateItem(0)
+mail.To=recipient
+mail.Subject= subject
+mail.HTMLBody=report
 
-# mail.Send()
-
-
-
-# msg = MIMEText(report, 'html')
-# msg['Subject'] = 'Visual Merch Status Report'
-# msg['From'] = 'youremail@yourdomain.com'
-# msg['To'] = 'youremail@yourdomain.com'
-
-# s = smtplib.SMTP('smtp.gmail.com', 587)
-# s.starttls()
-# s.login('youremail@yourdomain.com', 'yourpassword')
-# s.sendmail('youremail@yourdomain.com', 'recipientemail@recipientdomain.com', msg.as_string())
-# s.quit()
+mail.Send()

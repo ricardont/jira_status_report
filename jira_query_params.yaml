@@ -1,4 +1,3 @@
-projects: '"VMDS","Visual Merch DZ Development","DMAS"'
 not_in_progress_status: ' Completed, Done, "To Do", Backlog'
 days_back: 8
 order_by: ' ORDER BY resolved DESC,  priority DESC, due ASC, status ASC, project ASC, key ASC'
