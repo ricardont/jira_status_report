@@ -31,13 +31,7 @@ elif area == 'Visual Merch':
     projects_names = 'VMDS,VMDD'
 else:
     area = 'Merch'
-
-
-boards = 'DMAS'
-if area == "All":
-    boards += ',VMDS,VMDD' 
-if area == "Visual Merch":
-    boards = 'VMDS,VMDD'        
+      
 projects  = '( PROJECT in ( ' + projects_names + ') and issuetype != Epic and status != "Cancelled" ) ' 
 days_back  = jira_query_params['days_back']
 not_in_progress_status  = jira_query_params['not_in_progress_status']
@@ -51,8 +45,7 @@ new_count = len(new_tickets)
 
 # Create the report
 report = f'''
-    <h2>Tasks Status within the last {str(days_back)} days</h2>
-    <h2>Counts of Each Type of Ticket</h2>
+    <h3>Tasks Status within the last {str(days_back)} days</h3>
         <li>Completed: {completed_count}</li>
     <ul>
         <li>In Progress: {in_progress_count}</li>
@@ -67,7 +60,7 @@ report += '''
     </ul>
 '''
 for ticket in completed_tickets:
-    print(f'<li>{ticket.key}: {ticket.fields.summary}</li>')
+    report += f'<li>{ticket.key}: {ticket.fields.summary}</li>'
 
 # Add the In Progress tickets to the report
 report += '''
@@ -86,9 +79,7 @@ report += '''
 '''
 for ticket in new_tickets:
     report += f'<li>{ticket.key}: {ticket.fields.summary}</li>'
-print(report)
-
-
+    
 # Email the report
 recipient    = credentials['mail']['recipient']
 sender       = credentials['mail']['sender']
