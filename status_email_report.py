@@ -22,7 +22,6 @@ except JIRAError as e:
    print(e.status_code, e.text)
 
 # Get the counts of each type of ticket
-# projects_names  = "VMDS","VMDD","DMAS"
 projects_names  = '"VMDS","VMDD","DMAS"'
 area = 'Visual Merch'  
 if area == 'Merch Analysis' :
@@ -44,6 +43,8 @@ in_progress_count = len(in_progress_tickets)
 new_count = len(new_tickets)
 
 # Create the report
+# Top Counter Box
+top_box_style = 'align="center" width="150"'
 report = f'''
 <h3>Tasks Status within the last {str(days_back)} days</h3>
 <table>
@@ -53,40 +54,55 @@ report = f'''
         <th>New</th>
     </tr>
     <tr style="font-size:40px" >
-        <td align="center" width="150" >{completed_count}</td>
-        <td align="center" width="150" >{in_progress_count}</td>
-        <td align="center" width="150" >{new_count}</td>
+        <td {top_box_style}>{completed_count}</td>
+        <td {top_box_style}>{in_progress_count}</td>
+        <td {top_box_style}>{new_count}</td>
     </tr>
 </table>
 '''
 
 # Add the Completed tickets to the report
-report += '''
-    <ul>
-    <h2>Completed</h2>
-    </ul>
-'''
-for ticket in completed_tickets:
-    report += f'<li>{ticket.key}: {ticket.fields.summary}</li>'
+report += '<table style="font-family: Calibri; width: 600px;" align="left">'
 
+report += '<tr><td><h3>Completed</h3></td></tr>'
+for ticket in completed_tickets:  
+    report += f'''
+        <tr>
+            <td><strong>{ticket.fields.summary}</strong></td>
+        </tr>
+        <tr style="border-bottom:solid gray 1px;">
+            <td style="color: gray;">{ticket.key} · {ticket.fields.assignee.displayName } · {ticket.fields.customfield_10801[-1].value}</td>
+            <td style="color: Blue;" align="right">{ticket.fields.status.name}</td>
+        </tr>
+        '''
 # Add the In Progress tickets to the report
-report += '''
-    <ul>
-    <h2>In Progress</h2>
-    </ul>
-'''
+report += '<tr><td><h3>In Progress</h3></td></tr>'
 for ticket in in_progress_tickets:
-    report += f'<li>{ticket.key}: {ticket.fields.summary}</li>'
-
+    report += f'''
+        <tr>
+            <td><strong>{ticket.fields.summary}</strong></td>
+        </tr>
+        <tr style="border-bottom:solid gray 1px;">
+            <td style="color: gray;">{ticket.key} · {ticket.fields.assignee.displayName } · {ticket.fields.customfield_10801[-1].value}</td>
+            <td style="color: Blue;" align="right">{ticket.fields.status.name}</td>
+        </tr>
+        '''
 # Add the New tickets to the report
-report += '''
-    <ul>
-    <h2>New</h2>
-    </ul>
-'''
+report += '<tr><td><h3>New</h3></td></tr>'
 for ticket in new_tickets:
-    report += f'<li>{ticket.key}: {ticket.fields.summary}</li>'
-    
+    report += f'''
+        <tr>
+            <td><strong>{ticket.fields.summary}</strong></td>
+        </tr>
+        <tr style="border-bottom:solid gray 1px;">
+            <td style="color: gray;">{ticket.key} · {ticket.fields.assignee.displayName } · {ticket.fields.customfield_10801[-1].value}</td>
+            <td align="right">
+                <span style="background-color:green;  border-radius: 10px; padding-left: 10px;
+    padding-right: 10px;">{ticket.fields.status.name}</span>
+                </td>
+        </tr>
+        '''
+report += '</table>'    
 # Email the report
 recipient    = credentials['mail']['recipient']
 sender       = credentials['mail']['sender']
