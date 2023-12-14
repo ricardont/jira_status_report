@@ -58,9 +58,6 @@ report = f'''
         <td {top_box_style}>{in_progress_count}</td>
         <td {top_box_style}>{new_count}</td>
     </tr>
-    <tr style="font-family: Calibri; border-bottom:solid gray 1px;">
-        <td><hr style="font-family: Calibri; width: 600px;" align="left"></td>
-    </tr>  
 </table>
 '''
 
@@ -73,9 +70,6 @@ def renderTableTickets(key, summary, assign_name, type, status ):
         <tr style="border-bottom:solid gray 1px;">
             <td style="color: gray;">{key} · {assign_name} · {type}</td>
             <td style="color: Blue;" align="right">{status}</td>
-        </tr>
-            <tr style="font-family: Calibri; border-bottom:solid gray 1px;">
-            <td><hr style="font-family: Calibri; width: 600px;" align="left"></td>
         </tr>  
         '''
 report += '<table style="font-family: Calibri; width: 600px;" align="left">'
