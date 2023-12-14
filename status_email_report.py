@@ -46,7 +46,7 @@ new_count = len(new_tickets)
 # Top Counter Box
 top_box_style = 'align="center" width="150"'
 report = f'''
-<h3>Tasks Status within the last {str(days_back)} days</h3>
+<h3>Projet Status for Last Week</h3>
 <table>
     <tr align="center">
         <th>Completed</th>
@@ -58,50 +58,40 @@ report = f'''
         <td {top_box_style}>{in_progress_count}</td>
         <td {top_box_style}>{new_count}</td>
     </tr>
+    <tr style="font-family: Calibri; border-bottom:solid gray 1px;">
+        <td><hr style="font-family: Calibri; width: 600px;" align="left"></td>
+    </tr>  
 </table>
 '''
 
 # Add the Completed tickets to the report
+def renderTableTickets(key, summary, assign_name, type, status ):
+    return f'''
+        <tr>
+            <td><strong>{summary}</strong></td>
+        </tr>
+        <tr style="border-bottom:solid gray 1px;">
+            <td style="color: gray;">{key} · {assign_name} · {type}</td>
+            <td style="color: Blue;" align="right">{status}</td>
+        </tr>
+            <tr style="font-family: Calibri; border-bottom:solid gray 1px;">
+            <td><hr style="font-family: Calibri; width: 600px;" align="left"></td>
+        </tr>  
+        '''
 report += '<table style="font-family: Calibri; width: 600px;" align="left">'
 
 report += '<tr><td><h3>Completed</h3></td></tr>'
 for ticket in completed_tickets:  
-    report += f'''
-        <tr>
-            <td><strong>{ticket.fields.summary}</strong></td>
-        </tr>
-        <tr style="border-bottom:solid gray 1px;">
-            <td style="color: gray;">{ticket.key} · {ticket.fields.assignee.displayName } · {ticket.fields.customfield_10801[-1].value}</td>
-            <td style="color: Blue;" align="right">{ticket.fields.status.name}</td>
-        </tr>
-        '''
+    report += renderTableTickets(ticket.key, ticket.fields.summary, ticket.fields.assignee.displayName, ticket.fields.customfield_10801[-1].value, ticket.fields.status.name)
 # Add the In Progress tickets to the report
 report += '<tr><td><h3>In Progress</h3></td></tr>'
 for ticket in in_progress_tickets:
-    report += f'''
-        <tr>
-            <td><strong>{ticket.fields.summary}</strong></td>
-        </tr>
-        <tr style="border-bottom:solid gray 1px;">
-            <td style="color: gray;">{ticket.key} · {ticket.fields.assignee.displayName } · {ticket.fields.customfield_10801[-1].value}</td>
-            <td style="color: Blue;" align="right">{ticket.fields.status.name}</td>
-        </tr>
-        '''
+    report += renderTableTickets(ticket.key, ticket.fields.summary, ticket.fields.assignee.displayName, ticket.fields.customfield_10801[-1].value, ticket.fields.status.name)    
 # Add the New tickets to the report
 report += '<tr><td><h3>New</h3></td></tr>'
 for ticket in new_tickets:
-    report += f'''
-        <tr>
-            <td><strong>{ticket.fields.summary}</strong></td>
-        </tr>
-        <tr style="border-bottom:solid gray 1px;">
-            <td style="color: gray;">{ticket.key} · {ticket.fields.assignee.displayName } · {ticket.fields.customfield_10801[-1].value}</td>
-            <td align="right">
-                <span style="background-color:green;  border-radius: 10px; padding-left: 10px;
-    padding-right: 10px;">{ticket.fields.status.name}</span>
-                </td>
-        </tr>
-        '''
+    report += renderTableTickets(ticket.key, ticket.fields.summary, ticket.fields.assignee.displayName, ticket.fields.customfield_10801[-1].value, ticket.fields.status.name) 
+
 report += '</table>'    
 # Email the report
 recipient    = credentials['mail']['recipient']
